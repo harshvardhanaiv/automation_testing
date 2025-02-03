@@ -1,7 +1,2 @@
-
-# Playwright
+# Ignore node_modules
 node_modules/
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
