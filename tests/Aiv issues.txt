@@ -1,0 +1,4 @@
+Issue:
+Master-data>Parameters>dynamic>text box --- need to hide for dynamic
+
+IN parameter while selecting two parameter at same time and cloning it name get disappear.

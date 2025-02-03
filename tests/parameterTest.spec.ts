@@ -5,11 +5,14 @@ dotenv.config();
 
 test.describe('AIV Login and Create MySQL', () => {
   test('Login, Navigate, and Create MySQL', async ({ page }, testInfo) => {
-    testInfo.setTimeout(120000); // Set timeout for this specific test to 2 minutes
+    // Increased timeout for the entire test
+    testInfo.setTimeout(120000);
 
     const BASE_URL = process.env.AIV_BASE_URL;
     const USERNAME = process.env.AIV_USERNAME;
     const PASSWORD = process.env.AIV_PASSWORD;
+    // const DEMO_USERNAME = process.env.AIV_DEMO_USERNAME; // Not used, so commented out
+    // const DEMO_PASSWORD = process.env.AIV_DEMO_PASSWORD; // Not used, so commented out
 
     // Increase default navigation timeout
     page.setDefaultTimeout(90000);
@@ -43,6 +46,7 @@ test.describe('AIV Login and Create MySQL', () => {
       // Click on the second element
       await page.locator('.mat-expansion-indicator.ng-tns-c75-12.ng-trigger.ng-trigger-indicatorRotate.ng-star-inserted').click();
 
+
       // --- New Steps for Dataset Creation ---
       const page3Promise = page.waitForEvent('popup');
       await page.getByLabel('Master Data').getByRole('link', { name: '' }).nth(1).click();
@@ -54,23 +58,33 @@ test.describe('AIV Login and Create MySQL', () => {
       
       await page3.locator('pre').nth(1).click();
       await page3.locator('codemirror').filter({ hasText: 'xxxxxxxxxx1 1' }).getByRole('textbox').fill('select `material_id` AS "material_id",`material_name` AS "material_name",`category` AS "category",`unit_of_measure` AS "unit_of_measure",`current_stock` AS "current_stock",`min_stock_level` AS "min_stock_level",`max_stock_level` AS "max_stock_level",`last_purchase_price` AS "last_purchase_price",`status` AS "status" From raw_materials');
+     
+      await page3.locator('mat-dialog-content').getByRole('button', { name: 'Create', exact: true }).click();
       
+      await page3.locator('#mat-mdc-dialog-1 div').filter({ hasText: /^Name$/ }).click();
+      await page3.locator('#mat-mdc-dialog-1 input[name="name"]').click();
+      await page3.locator('#mat-mdc-dialog-1 input[name="name"]').fill('category');
+      await page3.locator('p-dropdown').filter({ hasText: 'INTEGER' }).getByLabel('dropdown trigger').click();
+      await page3.getByRole('option', { name: 'CHAR', exact: true }).click();
+      await page3.getByRole('button', { name: 'Submit' }).click();
+      
+      await page3.getByRole('button', { name: 'dropdown trigger' }).click();
+      await page3.getByRole('option', { name: 'category' }).click();
+      await page3.locator('codemirror').filter({ hasText: 'xxxxxxxxxx1 1' }).getByRole('textbox').fill(' as d where category in ({{category}})');
+    
       await page3.getByRole('listitem').filter({ hasText: 'Output Columns' }).locator('span').first().click();
       await page3.getByRole('listitem').filter({ hasText: 'Preview' }).locator('span').first().click();
-      await page3.getByRole('link', { name: 'Page 2 of 2 Pages' }).click();
+      await page3.getByText('ParameterscategorySubmitCancel').click();
+      await page3.locator('input.p-inputtext.p-component.p-element.ais_tbox.ng-untouched.ng-pristine.ng-valid').fill('Metal');
+      await page3.getByRole('button', { name: 'Submit' }).click();
       await page3.getByRole('textbox', { name: 'Dataset Name' }).click();
-      await page3.getByRole('textbox', { name: 'Dataset Name' }).fill('Metal');
+      await page3.getByRole('textbox', { name: 'Dataset Name' }).fill('Metals');
       await page3.getByRole('button', { name: 'Create' }).click();
       await page3.getByRole('link', { name: '' }).click();
-      await page3.getByRole('row', { name: 'Select row is template cell column header is template cell column header File Name ds Admin is template cell column header Last Updated is template cell column header Options', exact: true }).locator('span').first().click();
-      await page3.getByRole('row', { name: 'Select row  is template cell' }).locator('a').click();
-      await page3.getByRole('tab', { name: 'Schedule' }).locator('a').click();
-      await page3.getByText('Output').click();
-      await page3.getByRole('tab', { name: 'Email' }).locator('a').click();
-      await page3.getByRole('button', { name: 'Run' }).click();
-    } catch (error) {
-      console.error('Login test failed:', error);
-      throw error;
+    
+} catch (error) {
+  console.error('Login test failed:', error);
+  throw error;
     }
   });
 });
